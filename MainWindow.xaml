@@ -12,7 +12,7 @@
                 <!-- Adjust the Margin property as needed -->
                 <Border Background="#141414" CornerRadius="10">
                     <Border.Effect>
-                        <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.25" Direction="290"/>
+                        <DropShadowEffect ShadowDepth="1" BlurRadius="10" Opacity="0.25" Direction="290"/>
                     </Border.Effect>
                     <AdornerDecorator>
                         <ContentControl Content="{TemplateBinding Content}" />
@@ -31,29 +31,28 @@
                     <ControlTemplate TargetType="TabItem">
                         <Grid>
                             <Border Name="border"
-                                Padding="2,2"
+                                Padding="4,8"
                                 CornerRadius="10,10,0,0"
                                 Width="120"
-                                Height="25"
+                                Height="40"
                                 SnapsToDevicePixels="True">
-                                <ContentPresenter x:Name="TabLabel" ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <ContentPresenter x:Name="TabLabel" ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Top">
                                     <ContentPresenter.Resources>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="FontSize" Value="14"/>
-                                            
                                         </Style>
                                     </ContentPresenter.Resources>
                                 </ContentPresenter>
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="HotPink"/>
-                                <Setter TargetName="TabLabel" Property="TextElement.Background" Value="#f3f3f3"/>
-                            </Trigger>
                             <Trigger Property="IsSelected" Value="False">
                                 <Setter TargetName="border" Property="Background" Value="#141414"/>
                                 <Setter TargetName="TabLabel" Property="TextElement.Foreground" Value="#f3f3f3"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="HotPink"/>
+                                <Setter TargetName="TabLabel" Property="TextElement.Background" Value="#f3f3f3"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#f3f3f3"/>
@@ -71,42 +70,131 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TabControl">
                         <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
                             <Border x:Name="border"
                                     CornerRadius="0,10,10,10"
-                                    Width="400"
-                                    Background="#F3F3F3"/>
-                            <ItemsControl Margin="0,-25,0,0">
-                                    <TabPanel x:Name="HeaderPanel" IsItemsHost="True"/> 
+                                    Width="800"
+                                    Background="#141414" Margin="0,0,-10,0" Grid.RowSpan="2"/>
+                            <ItemsControl Margin="0,-30,0,0" Grid.RowSpan="2">
+                                <TabPanel x:Name="HeaderPanel" IsItemsHost="True"/>
                             </ItemsControl>
-                            <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Row="1" ContentSource="SelectedContent" Margin="50,50,50,50" Width="300" Height="250"/>
+                            <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Row="1" ContentSource="SelectedContent" Margin="0,0,0,0" Width="300" Height="250" HorizontalAlignment="Left" Grid.RowSpan="2" VerticalAlignment="Top"/>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="GenerateBtn" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                        BorderThickness="0"
+                        Padding="2,2"
+                        BorderBrush="Transparent"
+                        CornerRadius="4"
+                        Height="24"
+                        Width="140"
+                        Background="#141414">
+                            <ContentPresenter x:Name="btnLbl" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="20">
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="HotPink"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DownloadBtn" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                        BorderThickness="0"
+                        Padding="2,2"
+                        BorderBrush="Transparent"
+                        CornerRadius="4"
+                        Height="24"
+                        Width="140"
+                        Background="#f3f3f3">
+                            <ContentPresenter x:Name="btnLbl" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="20">
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#141414"/>
+                                        <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="HotPink"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
+    <!-- ACTUAL CONTENT -->
     <Grid>
-        <TabControl Style="{StaticResource CustomTabControl}" HorizontalAlignment="Left" Margin="0,32,0,0">
+        <TabControl Style="{StaticResource CustomTabControl}" HorizontalAlignment="Center" Margin="-20,35,0,10" Width="770">
             <TabItem x:Name="GenerateTabBtn" Header="Generate" Style="{StaticResource CustomTab}">
-                <Grid>
-                    <Border BorderBrush="Red" BorderThickness="2"/>
+                <Grid Background="Transparent" Margin="0,5,-479,-90">
+                    <Border CornerRadius="0,10,10,10" Width="79"/>
+                    <Rectangle Width="413" Height="325" VerticalAlignment="Top" HorizontalAlignment="Left" RadiusX="10" RadiusY="10" Fill="#f3f3f3"/>
+                    <Rectangle Width="10" Height="10" VerticalAlignment="Top" HorizontalAlignment="Left" Fill="#f3f3f3"/>
+                    <TextBox x:Name="inputTxt" HorizontalAlignment="Left" Margin="41,115,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="324" Height="95"/>
+                    <Button x:Name="generateBtn" Style="{StaticResource GenerateBtn}" Content="Generate" HorizontalAlignment="Left" Margin="133,233,0,0" VerticalAlignment="Top" Click="generateBtn_Click"/>
+                    <Button Content="Phone" HorizontalAlignment="Left" Margin="77,52,0,0" VerticalAlignment="Top" Width="75"/>
+                    <Button Content="Email" HorizontalAlignment="Left" Margin="169,52,0,0" VerticalAlignment="Top" Width="75"/>
+                    <Button Content="URL" HorizontalAlignment="Left" Margin="261,52,0,0" VerticalAlignment="Top" Width="75"/>
+                    <Image x:Name="bitmapImg" HorizontalAlignment="Left" Height="240" Margin="483,17,0,0" VerticalAlignment="Top" Width="240" Source="/Assets/Quay 12.png">
+                        <Image.Effect>
+                            <DropShadowEffect Opacity="0.25" BlurRadius="35" Direction="270" ShadowDepth="4" Color="White"/>
+                        </Image.Effect>
+                    </Image>
+                    <Button Style="{StaticResource DownloadBtn}" Content="Download" HorizontalAlignment="Left" Margin="533,277,0,0" VerticalAlignment="Top" FontSize="14" Padding="1,0,1,2"/>
+
                 </Grid>
             </TabItem>
             <TabItem x:Name="ReadTabBtn" Header="Read" Style="{StaticResource CustomTab}">
-                <Grid Background="Red">
-                    <Border CornerRadius="0,10,10,10"/>
-
+                <Grid Background="Transparent" Margin="0,5,-479,-90">
+                    <Border CornerRadius="0,10,10,10" Width="79"/>
+                    <Rectangle Width="413" Height="318" VerticalAlignment="Top" HorizontalAlignment="Left" RadiusX="10" RadiusY="10" Fill="#f3f3f3"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="SettingsTabBtn" Header="Settings" Style="{StaticResource CustomTab}">
-                <Grid Background="Red">
-                    <Border CornerRadius="0,10,10,10"/>
-
+                <Grid Background="Transparent" Margin="0,5,-479,-90">
+                    <Border CornerRadius="0,10,10,10" Width="79"/>
+                    <Rectangle Width="413" Height="318" VerticalAlignment="Top" HorizontalAlignment="Left" RadiusX="10" RadiusY="10" Fill="#f3f3f3"/>
                 </Grid>
             </TabItem>
         </TabControl>
-        <Rectangle x:Name="Draggable" Fill="#141414" HorizontalAlignment="Left" Height="380" Margin="400,0,0,0" VerticalAlignment="Center" Width="382" MouseDown="drag_MouseDown"/>
+        <Rectangle x:Name="Draggable" Fill="Transparent" Opacity="0.4" HorizontalAlignment="Left" Height="45" Margin="374,0,0,0" VerticalAlignment="Top" Width="377" MouseDown="drag_MouseDown"/>
         <Button Content="X" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="24" Click="Close_Click"/>
+
+
 
     </Grid>
 </Window>

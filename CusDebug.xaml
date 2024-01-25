@@ -1,0 +1,16 @@
+﻿<Window x:Class="Quay_Code.CusDebug"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Quay_Code"
+        mc:Ignorable="d"
+        Title="CusDebug" Height="537" Width="300" VerticalAlignment="Bottom">
+    <Grid Margin="10,10,10,10">
+        <TextBlock HorizontalAlignment="Left" Margin="22,10,0,0" TextWrapping="Wrap" Text="Size:" VerticalAlignment="Top" Width="65" Height="22" FontSize="16"/>
+        <TextBlock x:Name="debug_SizeMetric" HorizontalAlignment="Left" Margin="92,10,0,0" TextWrapping="Wrap" Text="SM" VerticalAlignment="Top" Width="168" Height="22" FontSize="16"/>
+        <TextBlock x:Name="debug_ECCOut" HorizontalAlignment="Left" Margin="22,37,0,0" TextWrapping="Wrap" Text="RSECC Output" VerticalAlignment="Top" Width="246" Height="180" FontSize="16"/>
+        <TextBlock x:Name="debug_BinOut" HorizontalAlignment="Left" Margin="22,0,0,10" TextWrapping="Wrap" Text="Binary Output" VerticalAlignment="Bottom" Width="246" Height="240" FontSize="16"/>
+        <TextBlock x:Name="debug_BinHeader" HorizontalAlignment="Left" Margin="22,0,0,250" TextWrapping="Wrap" Text="Binary Header" VerticalAlignment="Bottom" Width="246" Height="29" FontSize="16"/>
+    </Grid>
+</Window>
