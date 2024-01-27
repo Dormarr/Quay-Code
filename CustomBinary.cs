@@ -64,7 +64,7 @@ namespace Quay_Code
             return ints.ToArray();
         }
 
-        public static string WriteBinary(string input)
+        public static string WriteBinary(string input, int sizeMetric)
         {
             StringBuilder sb = new StringBuilder();
             string output = "";
@@ -72,10 +72,29 @@ namespace Quay_Code
             foreach(char c in input)
             {
                 sb.Append(Convert.ToString(c, 2).PadLeft(8, '0'));
-                output = sb.ToString();
             }
 
             //pad binary to fill d-bits.
+
+            switch (sizeMetric)
+            {
+                case 12:
+                    sb.Append("011011");
+                    break;
+                case 18:
+                    sb.Append("011011");
+                    break;
+                case 24:
+                    sb.Append("11");
+                    break;
+                case 32:
+                    sb.Append("1101");
+                    break;
+                default:
+                    break;
+            }
+
+            output = sb.ToString();
 
             return output;
         }

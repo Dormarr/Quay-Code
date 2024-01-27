@@ -78,7 +78,7 @@ namespace Quay_Code
             string passAlong = PadText(input);
             passAlong = WriteECC(passAlong, input.Length);
             cusDebug.debug_ECCOut.Text = passAlong; //-----------------------------------------------
-            passAlong = CustomBinary.WriteBinary(passAlong);
+            passAlong = CustomBinary.WriteBinary(passAlong, sizeMetric);
             CreateGraphicCode(EncodeToPairs(passAlong), Coords.GetDataSlots(sizeMetric));
 
             cusDebug.debug_BinOut.Text = passAlong;//-----------------------------------------------
@@ -174,9 +174,52 @@ namespace Quay_Code
                 pairs[i / 2] = input.Substring(i, 2);
             }
 
-            //add binary padding.
-
             return pairs;
+        }
+
+        //====================== Decode ==========================
+
+        public string Decode(string input, int sizeMetric)
+        {
+            int padAmt;
+
+            switch (sizeMetric)
+            {
+                case 12:
+                    padAmt = 160;
+                    break;
+                case 18:
+                    padAmt = 430;
+                    break;
+                case 24:
+                    padAmt = 898;
+                    break;
+                case 32:
+                    padAmt = 1580;
+                    break;
+                default:
+                    padAmt = 160;
+                    break;
+            }
+            string paddedIn = input.PadRight(padAmt, '0');
+            byte[] data = GetBytesFromBinaryString(paddedIn);
+            byte[] B4data = Convert.FromBase64String(paddedIn);
+
+            return Encoding.UTF8.GetString(data);
+        }
+
+        public static Byte[] GetBytesFromBinaryString(string binary)
+        {
+            var list = new List<Byte>();
+
+            for (int i = 0; i < binary.Length; i += 8)
+            {
+                String t = binary.Substring(i, 8);
+
+                list.Add(Convert.ToByte(t, 2));
+            }
+
+            return list.ToArray();
         }
 
 
@@ -284,6 +327,42 @@ namespace Quay_Code
             }
 
             this.bitmapImg.Source = bitmap;
+        }
+
+        private void Phone_Click(object sender, RoutedEventArgs e)
+        {
+            inputTxt.Text = "tel:+1234567890";
+        }
+
+        private void Email_Click(object sender, RoutedEventArgs e)
+        {
+            inputTxt.Text = "mailto:john.doe@example.com";
+        }
+
+        private void URL_Click(object sender, RoutedEventArgs e)
+        {
+            inputTxt.Text = "https://www.example.com";
+        }
+
+        private void Wifi_Click(object sender, RoutedEventArgs e)
+        {
+            inputTxt.Text = "wifi:S:SSID;P:password;T:WPA;";
+        }
+
+        private void SMS_Click(object sender, RoutedEventArgs e)
+        {
+            inputTxt.Text = "sms:+1234567890?body=Hello%20World";
+        }
+
+        private void Geo_Click(object sender, RoutedEventArgs e)
+        {
+            inputTxt.Text = "geo:latitude,longitude";
+        }
+
+        private void Det_Cam_Click(object sender, RoutedEventArgs e)
+        {
+            Detect dtc = new Detect();
+            dtc.IdentifyFromVideo(webcamImage);
         }
     }
 }
