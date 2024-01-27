@@ -19,61 +19,38 @@ using System.Windows.Media.Imaging;
 using Size = System.Drawing.Size;
 using Point = System.Drawing.Point;
 using Image = System.Windows.Controls.Image;
+using System.Windows.Threading;
+using System.ComponentModel;
 
 namespace Quay_Code
 {
+
+
     public partial class Detect
     {
-        public void IdentifyFromVideo(Image webcamImg)
+
+        public Detect()
         {
 
-            bool pause = false;
-
-            try
-            {
-                VideoCapture vid = new(0, VideoCapture.API.DShow);
-                vid.Set(CapProp.FrameHeight, 480);
-                vid.Set(CapProp.FrameWidth, 640);
-
-                try
-                {
-                    
-
-                    while (!pause)
-                    {
-                        Mat frame = new();
-                        vid.Read(frame);
-
-                        //CvInvoke.Imshow("Raw Input", frame);
-                        webcamImg.Source = frame.ToImageSource();
-
-                        if (frame != null)
-                        {
-
-                            //Mat[] outputArray = FindSquares(frame);
-                            //CvInvoke.Imshow("Human Vision", outputArray[1]);
-                        }
-                    }
-                    //key to pause
-
-
-                }
-                catch(Exception exc)
-                {
-                    MessageBox.Show($"Error Processing Frame: {exc.Message}");
-                }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show($"Error Initialising Webcam: {ex.Message}");
-            }
         }
+
+        public void DetectFromVideo()
+        {
+            //_vp.IdentifyFromVideo(webcamImg);
+            //Mat[] postPro = FindSquares(_vp.ToProcess());
+            //webcamImg.Source = postPro[0].ToImageSource();
+            
+
+
+        }
+
+        //========================= Draw & Identify ==================================
 
         public Mat[] FindSquares(Mat input)
         {
             Mat frameGray = new();
             Mat threshMat = new();
-            //MCvScalar sclr = new MCvScalar(85, 255, 55);
+            MCvScalar sclr = new MCvScalar(85, 255, 55);
             CvInvoke.CvtColor(input, frameGray, ColorConversion.Bgr2Gray);
             CvInvoke.AdaptiveThreshold(frameGray, threshMat, 255, AdaptiveThresholdType.MeanC, ThresholdType.BinaryInv, 11, 5);
 
@@ -446,28 +423,5 @@ namespace Quay_Code
             }
         }
 
-    }
-
-    public static class EmguExtensions
-    {
-        public static ImageSource ToImageSource(this Mat mat)
-        {
-            return mat.ToBitmap().ToImageSource();
-        }
-
-        public static ImageSource ToImageSource(this System.Drawing.Bitmap bitmap)
-        {
-            using (var memory = new System.IO.MemoryStream())
-            {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                memory.Position = 0;
-                var bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = memory;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-                return bitmapImage;
-            }
-        }
     }
 }

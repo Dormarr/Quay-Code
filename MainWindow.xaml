@@ -200,7 +200,8 @@
             <TabItem x:Name="GenerateTabBtn" Header="Generate" Style="{StaticResource CustomTab}">
                 <Grid Background="Transparent" Margin="0,5,-479,-90">
                     <Border CornerRadius="0,10,10,10" Width="79"/>
-                    <Rectangle Width="413" Height="325" VerticalAlignment="Top" HorizontalAlignment="Left" RadiusX="10" RadiusY="10" Fill="#f3f3f3"/>
+                    <Rectangle Width="413" Height="325" VerticalAlignment="Top" HorizontalAlignment="Left" RadiusX="10" RadiusY="10" Fill="#f3f3f3">
+                    </Rectangle>
                     <Rectangle Width="10" Height="10" VerticalAlignment="Top" HorizontalAlignment="Left" Fill="#f3f3f3"/>
                     <TextBox x:Name="inputTxt" HorizontalAlignment="Left" Margin="41,115,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="324" Height="95" Background="#FFF3F3F3" BorderBrush="#1E000000" SelectionBrush="#FFF544B6"/>
                     <Button x:Name="generateBtn" Style="{StaticResource GenerateBtn}" Content="Generate" HorizontalAlignment="Left" Margin="133,233,0,0" VerticalAlignment="Top" Click="generateBtn_Click"/>
@@ -221,9 +222,18 @@
             </TabItem>
             <TabItem x:Name="ReadTabBtn" Header="Read" Style="{StaticResource CustomTab}">
                 <Grid Background="Transparent" Margin="0,5,-479,-90">
-                    <Border CornerRadius="0,10,10,10" Width="750">
+                    <Border CornerRadius="12" Width="750" Margin="14,0,15,17" BorderThickness="4" BorderBrush="#F3F3F3">
                     </Border>
-                    <Image x:Name="webcamImage" Margin="454,20,36,127" Stretch="Fill"/>
+                    <Image x:Name="webcamImage" Margin="392,0,17,17" Stretch="UniformToFill">
+                        <Image.Clip>
+                            <RectangleGeometry RadiusX="10" RadiusY="10" Rect="0,4,368,310"/>
+                        </Image.Clip>
+                    </Image>
+                    <Rectangle Width="78" Height="318" VerticalAlignment="Top" HorizontalAlignment="Center" RadiusX="20" RadiusY="10" Fill="#141414" Opacity="0.4">
+                        <Rectangle.Effect>
+                            <BlurEffect/>
+                        </Rectangle.Effect>
+                    </Rectangle>
                     <Rectangle Width="413" Height="318" VerticalAlignment="Top" HorizontalAlignment="Left" RadiusX="10" RadiusY="10" Fill="#f3f3f3"/>
                     <Button Style="{StaticResource GenerateBtn}" Content="Detect from Camera" HorizontalAlignment="Left" Margin="114,98,0,0" VerticalAlignment="Top" Width="186" Click="Det_Cam_Click"/>
                 </Grid>

@@ -25,7 +25,7 @@ namespace Quay_Code
         {
             InitializeComponent();
 
-            cusDebug.Show(); //debug window
+            //cusDebug.Show(); //debug window
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
@@ -361,8 +361,11 @@ namespace Quay_Code
 
         private void Det_Cam_Click(object sender, RoutedEventArgs e)
         {
-            Detect dtc = new Detect();
-            dtc.IdentifyFromVideo(webcamImage);
+            //Detect dtc = new Detect(webcamImage);
+            //dtc.DetectFromVideo();
+
+            VideoProcessor _vp = new VideoProcessor(webcamImage);
+            _vp.IdentifyFromVideo();
         }
     }
 }
