@@ -1,5 +1,7 @@
 # Quay Code
-(image)
+
+<img width="960" alt="snap2023-12-23-15-06-59 2" src="https://github.com/Dormarr/Quay-Code/assets/134154948/63dddad1-51a4-407a-bd1a-c6f7d7945660">
+
 
 Quay Code is a desktop based, open source CMYK 2D matrix code generator and reader. Currently it only runs on Windows but macOS and iOS development is underway. It uses dual binary encoding, meaning each colour contains 2 binary bits, allowing for potentially twice the data to be stored in each code. It uses Reed Solomon Error Correction for reliable decoding, and I'm constantly working on enhancing the CV capabilities for better and faster recognition of the codes.
 
@@ -34,7 +36,7 @@ Once the ECC is applied, it converts to binary pairs and sends through to the gr
 
 I actually do not use raw CMYK values for the output code, rather slightly adjusted, softer colours for aesthetic value. I intend to stress test each version to determine how much of a performance sacrifice this is, but so far it has not shown to be of terrible consequence.
 
-(quay empty templates)
+![Quay Templates](https://github.com/Dormarr/Quay-Code/assets/134154948/1ba86db6-30e0-42fb-94ac-e92969b288de)
 
 Early in the project I drew out the code templates, with the data slots clearly visible. I went through multiple iterations and intend to do further testing once I have a fully stable build of the app, but the current format works. The code divides the bitmap up into a pixel coordinate grid and I use these coordinates as slots for the bitmap rendering. I have constant data slots for each size, and for black, white, and CMYK values. Black and White are used for the template and border, so remain constant, and the data slots vary obviously due to the input of data but use the full CMYK palette. The data coordinate info also comes in handy for the reading stage as it limits the analysis to the appropriate slots.
 
