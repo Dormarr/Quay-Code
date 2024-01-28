@@ -40,6 +40,7 @@
                                     <ContentPresenter.Resources>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="FontSize" Value="14"/>
+                                            <Setter Property="FontFamily" Value="Strawford"/>
                                         </Style>
                                     </ContentPresenter.Resources>
                                 </ContentPresenter>
@@ -51,7 +52,7 @@
                                 <Setter TargetName="TabLabel" Property="TextElement.Foreground" Value="#f3f3f3"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="HotPink"/>
+                                <Setter TargetName="border" Property="Background" Value="#FF2D8C"/>
                                 <Setter TargetName="TabLabel" Property="TextElement.Background" Value="#f3f3f3"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
@@ -105,6 +106,7 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="White"/>
                                         <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="FontFamily" Value="Strawford"/>
                                         <Setter Property="HorizontalAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                     </Style>
@@ -113,7 +115,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="HotPink"/>
+                                <Setter TargetName="border" Property="Background" Value="#FF2D8C"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -138,6 +140,7 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="#141414"/>
                                         <Setter Property="FontSize" Value="14"/>
+                                        <Setter Property="FontFamily" Value="Strawford"/>
                                         <Setter Property="HorizontalAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                     </Style>
@@ -146,7 +149,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="HotPink"/>
+                                <Setter TargetName="border" Property="Background" Value="#FF2D8C"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -178,6 +181,7 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="#141414"/>
                                         <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="FontFamily" Value="Strawford"/>
                                         <Setter Property="HorizontalAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                     </Style>
@@ -187,6 +191,30 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#B5B5B5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="EmptyBtn" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="border" 
+                        BorderThickness="0"
+                        Padding="2,2"
+                        CornerRadius="4"
+                        Height="22"
+                        Width="22"
+                        Background="Transparent">
+                            <ContentPresenter x:Name="btnLbl" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="20"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="Transparent"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -203,17 +231,17 @@
                     <Rectangle Width="413" Height="325" VerticalAlignment="Top" HorizontalAlignment="Left" RadiusX="10" RadiusY="10" Fill="#f3f3f3">
                     </Rectangle>
                     <Rectangle Width="10" Height="10" VerticalAlignment="Top" HorizontalAlignment="Left" Fill="#f3f3f3"/>
-                    <TextBox x:Name="inputTxt" HorizontalAlignment="Left" Margin="41,115,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="324" Height="95" Background="#FFF3F3F3" BorderBrush="#1E000000" SelectionBrush="#FFF544B6"/>
+                    <TextBox x:Name="inputTxt" HorizontalAlignment="Left" Margin="41,115,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="324" Height="95" Background="#FFF3F3F3" BorderBrush="#1E000000" SelectionBrush="#FF2D8C" FontFamily="Strawford"/>
                     <Button x:Name="generateBtn" Style="{StaticResource GenerateBtn}" Content="Generate" HorizontalAlignment="Left" Margin="133,233,0,0" VerticalAlignment="Top" Click="generateBtn_Click"/>
                     <Button Content="Phone" Style="{StaticResource PresetBtn}" HorizontalAlignment="Left" Margin="77,52,0,0" VerticalAlignment="Top" Width="75" Click="Phone_Click"/>
                     <Button Content="Email" Style="{StaticResource PresetBtn}" HorizontalAlignment="Left" Margin="169,52,0,0" VerticalAlignment="Top" Width="75" Click="Email_Click"/>
                     <Button Content="URL" Style="{StaticResource PresetBtn}" HorizontalAlignment="Left" Margin="261,52,0,0" VerticalAlignment="Top" Width="75" Click="URL_Click"/>
-                    <Image x:Name="bitmapImg" HorizontalAlignment="Left" Height="240" Margin="483,32,0,0" VerticalAlignment="Top" Width="240" Source="/Assets/Quay 12.png">
+                    <Image x:Name="bitmapImg" Height="240"  Width="240" Margin="484,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"  Stretch="UniformToFill" Source="/Assets/Quay 12.png">
                         <Image.Effect>
-                            <DropShadowEffect Opacity="0.25" BlurRadius="35" Direction="270" ShadowDepth="4" Color="White"/>
+                            <DropShadowEffect Opacity="0.2" BlurRadius="40" Direction="270" ShadowDepth="4" Color="White"/>
                         </Image.Effect>
                     </Image>
-                    <Button Style="{StaticResource DownloadBtn}" Content="Download" HorizontalAlignment="Left" Margin="533,287,0,0" VerticalAlignment="Top" FontSize="14" Padding="1,0,1,2"/>
+                    <Button Style="{StaticResource DownloadBtn}" Content="Download" HorizontalAlignment="Left" Margin="533,287,0,0" VerticalAlignment="Top" FontSize="14" Padding="1,0,1,2" Click="Download_Click"/>
                     <Button Content="Wifi" Style="{StaticResource PresetBtn}" HorizontalAlignment="Left" Margin="77,77,0,0" VerticalAlignment="Top" Width="75" Click="Wifi_Click"/>
                     <Button Content="SMS" Style="{StaticResource PresetBtn}" HorizontalAlignment="Left" Margin="169,77,0,0" VerticalAlignment="Top" Width="75" Click="SMS_Click"/>
                     <Button Content="Geo" Style="{StaticResource PresetBtn}" HorizontalAlignment="Left" Margin="261,77,0,0" VerticalAlignment="Top" Width="75" Click="Geo_Click"/>
@@ -229,7 +257,7 @@
                             <RectangleGeometry RadiusX="10" RadiusY="10" Rect="0,4,368,310"/>
                         </Image.Clip>
                     </Image>
-                    <Rectangle Width="78" Height="318" VerticalAlignment="Top" HorizontalAlignment="Center" RadiusX="20" RadiusY="10" Fill="#141414" Opacity="0.4">
+                    <Rectangle Height="318" VerticalAlignment="Top" RadiusX="50" RadiusY="5" Fill="#141414" Opacity="0.2" Margin="382,0,356,0">
                         <Rectangle.Effect>
                             <BlurEffect/>
                         </Rectangle.Effect>
@@ -246,7 +274,23 @@
             </TabItem>
         </TabControl>
         <Rectangle x:Name="Draggable" Fill="Transparent" Opacity="0.4" HorizontalAlignment="Left" Height="69" Margin="374,0,0,0" VerticalAlignment="Top" Width="377" MouseDown="drag_MouseDown"/>
-        <Button Content="X" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="24" Click="Close_Click"/>
+        <Button x:Name="closeBtn" Margin="748,0,0,348" Click="Close_Click" Height="22" Width="22" Background="#FF141414" Style="{StaticResource EmptyBtn}">
+            <Button.Content>
+                <Image Height="18" Width="18">
+                    <Image.Style>
+                        <Style TargetType="{x:Type Image}">
+                            <Setter Property="Source" Value="\Assets\X_White.png" />
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Source" Value="/Assets/X_Pink.png" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+            </Button.Content>
+        </Button>
+        <TextBlock TextWrapping="Wrap" Text="Quay Code 0.4.2-alpha" Foreground="#33F3F3F3" Margin="0,373,10,5" FontSize="10" HorizontalAlignment="Right" Width="132" TextAlignment="Right" FontFamily="Strawford"/>
 
 
 

@@ -21,6 +21,7 @@ using Point = System.Drawing.Point;
 using Image = System.Windows.Controls.Image;
 using System.Windows.Threading;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Quay_Code
 {
@@ -52,7 +53,7 @@ namespace Quay_Code
             Mat threshMat = new();
             MCvScalar sclr = new MCvScalar(85, 255, 55);
             CvInvoke.CvtColor(input, frameGray, ColorConversion.Bgr2Gray);
-            CvInvoke.AdaptiveThreshold(frameGray, threshMat, 255, AdaptiveThresholdType.MeanC, ThresholdType.BinaryInv, 11, 5);
+            CvInvoke.AdaptiveThreshold(frameGray, threshMat, 255, AdaptiveThresholdType.MeanC, ThresholdType.BinaryInv, 7, 7);
 
             VectorOfVectorOfPoint cnts = new VectorOfVectorOfPoint();
 
@@ -91,13 +92,14 @@ namespace Quay_Code
                 }
             }
 
-            DrawContourFloat(threshMat, cand, new MCvScalar(100, 255, 100));
 
             if(cnt2.Size == 4)
             {
                 GetContourBits(input, cnt2, 1024);
                 DrawContourFloat(input, cand, new MCvScalar(0, 255, 0));
             }
+
+            //DrawContourFloat(threshMat, cand, new MCvScalar(100, 255, 100));
 
             Mat[] mats = new Mat[2];
             mats[0] = threshMat;
@@ -142,8 +144,6 @@ namespace Quay_Code
                 PointF to = cnt[(i + 1) % cnt.Count];
                 Line ln = new Line();
                 CvInvoke.Line(img, PointFToPoint(from), PointFToPoint(to), color, 2);
-
-                //Redefine when this should be drawn, because it looks like madness at the moment.
             }
         }
 
@@ -165,7 +165,7 @@ namespace Quay_Code
             return pointFArray;
         }
 
-        void GetContourBits(Mat image, VectorOfPointF cnt, int bits)
+        async void GetContourBits(Mat image, VectorOfPointF cnt, int bits)
         {
             int pixelLen = (int)Math.Sqrt(bits);
 
@@ -174,28 +174,50 @@ namespace Quay_Code
 
             Mat m = CvInvoke.GetPerspectiveTransform(cnt, cornerV);
             Mat binary = new();
-            CvInvoke.WarpPerspective(image, binary, m, new Size(bits, bits));
-            CvInvoke.Threshold(binary, binary, 64, 255, ThresholdType.Binary);
+            Mat persp = new();
+            CvInvoke.WarpPerspective(image, persp, m, new Size(bits, bits));
+            CvInvoke.Threshold(persp, binary, 64, 255, ThresholdType.Binary);
 
-            int scaleFactor = DetermineSize(binary);
+            //int scaleFactor = DetermineSize(binary);
+            int scaleFactor = DetermineSize(image);
 
             if (scaleFactor != 100)
             {
                 CvInvoke.PutText(image, scaleFactor.ToString(), PointFToPoint(cnt[0]), FontFace.HersheyPlain, 2, new MCvScalar(0, 0, 0));
                 DrawFullGrid(binary, scaleFactor, scaleFactor, new MCvScalar(0, 0, 255, 100));
-                //binary.Save("C:\\Users\\Ryan\\Desktop\\Software Testing Ground\\Spam\\bin" + DateTime.Now.Ticks + ".png");
+
+                List<PointF> cand = new List<PointF>();
+                for(int i = 0; i < corners.Length; i++)
+                {
+                    cand.Add(corners[i]);
+                }
+
+                DrawContourFloat(image, cand, new MCvScalar(0, 255, 0));
 
                 //NOW WE HAVE SIZE, WE CAN JUST DECODE.
-                //add header reading ability.
 
-                /*
-                int dataCount = ReadHeader(binary, scaleFactor)[0];
-                string readUntrunc = ReadCode(binary, scaleFactor);
+                //There's an issue here.
+                //Can I just have it so that if the reader malfunctions, it just moves on? Without alert?
+                //It's labelling it as Q12 even when it knows it's not.
 
-                string read = TruncateData(readUntrunc, dataCount);
+                try
+                {
+                    int dataCount = ReadHeader(binary, scaleFactor)[0];
+                    Debug.WriteLine($"DataCount = {dataCount}");
+                    //string readUntrunc = ReadCodeData(binary, scaleFactor);
+                    //string read = TruncateData(readUntrunc, dataCount);
 
-                CvInvoke.PutText(image, " " + read, PointFToPoint(cnt[2]), FontFace.HersheyPlain, 1.2, new MCvScalar(0, 0, 0));
-                */
+                    //CvInvoke.PutText(image, " " + read, PointFToPoint(cnt[2]), FontFace.HersheyPlain, 1.2, new MCvScalar(0, 0, 0));
+
+                    //Await most common output
+
+                }
+                catch(Exception e)
+                {
+                    Debug.WriteLine($"Issue with GetContourBits: {e.Message}");
+                }
+
+
             }
         }
 
@@ -254,11 +276,14 @@ namespace Quay_Code
             int pixelLen = metric;
             List<char> chars = new List<char>();
 
+
+            //Can this be refactored to use the coordinate system?
+
             for (int r = 2; r <= 2; ++r)
             {
                 for (int c = 0; c < size; ++c)
                 {
-                    int y = r * pixelLen + (pixelLen / 2);
+                    int y = r * pixelLen + (pixelLen / 2); //adjust this to find median colour of slot pixels.
                     int x = c * pixelLen + (pixelLen / 2);
 
                     if (image.GetRawData(y, x)[0] >= 128)
@@ -397,7 +422,7 @@ namespace Quay_Code
             return rawRead;
         }
 
-        string ReadCode(Mat image, int sizeMetric)
+        string ReadCodeData(Mat image, int sizeMetric)
         {
             (int, int)[] dataArray = new (int, int)[] { };
             

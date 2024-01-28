@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +25,7 @@ namespace Quay_Code
         public MainWindow()
         {
             InitializeComponent();
-
+            
             //cusDebug.Show(); //debug window
         }
 
@@ -43,6 +44,7 @@ namespace Quay_Code
         public int sizeMetric;
         WriteableBitmap bitmap;
         int staticSize = 240;
+        int scaledSize;
 
         private void generateBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -73,7 +75,9 @@ namespace Quay_Code
 
             cusDebug.debug_SizeMetric.Text = $"{sizeMetric}";
 
-            bitmap = new WriteableBitmap(staticSize, staticSize, 96, 96, PixelFormats.Bgra32, null);
+            scaledSize = (sizeMetric + 4) * (staticSize / (sizeMetric + 4));
+            //bitmap = new WriteableBitmap(staticSize, staticSize, 96, 96, PixelFormats.Bgra32, null);
+            bitmap = new WriteableBitmap(scaledSize, scaledSize, 96, 96, PixelFormats.Bgra32, null);
 
             string passAlong = PadText(input);
             passAlong = WriteECC(passAlong, input.Length);
@@ -86,6 +90,8 @@ namespace Quay_Code
             WriteHeader(inputCount);
 
             CreateOverlay(sizeMetric);
+
+            
         }
 
         private string PadText(string input)
@@ -225,9 +231,10 @@ namespace Quay_Code
 
         //===================== Drawing =======================
 
-        private WriteableBitmap Mark(int binPair, int scaleFactor, int x, int y, int w, int h, WriteableBitmap bitmap)
+        private WriteableBitmap Mark(int binPair, double scaleFactor, int x, int y, int w, int h, WriteableBitmap _bitmap)
         {
-            int stride = (scaleFactor * bitmap.Format.BitsPerPixel + 7) / 8;
+            int stride = (int)(scaleFactor * _bitmap.Format.BitsPerPixel + 7) / 8;
+            //int stride = (int)(scaleFactor * _bitmap.Format.BitsPerPixel) / 8;
             byte[] colour;
 
             switch (binPair)
@@ -250,9 +257,9 @@ namespace Quay_Code
             }
 
             Byte[] colourData = ColourIndex(colour, x, y, w, h);
-            bitmap.WritePixels(new Int32Rect(x, y, w, h), colourData, stride, 0);
+            _bitmap.WritePixels(new Int32Rect(x, y, w, h), colourData, stride, 0);
 
-            return bitmap;
+            return _bitmap;
         }
 
         private byte[] ColourIndex(byte[] inputColour, int rectX, int rectY, int rectWidth, int rectHeight)
@@ -305,9 +312,10 @@ namespace Quay_Code
 
         private void CreateGraphicCode(string[] data, (int,int)[] coords)
         {
+            //int scaleFactor = scaledSize / (sizeMetric + 4);
             int scaleFactor = staticSize / (sizeMetric + 4);
 
-            for(int i = 0; i < data.Length; i++)
+            for (int i = 0; i < data.Length; i++)
             {
                 int pairInt;
                 int.TryParse(data[i], out pairInt);
@@ -328,6 +336,8 @@ namespace Quay_Code
 
             this.bitmapImg.Source = bitmap;
         }
+
+        //=========================== Buttons =====================================
 
         private void Phone_Click(object sender, RoutedEventArgs e)
         {
@@ -366,6 +376,48 @@ namespace Quay_Code
 
             VideoProcessor _vp = new VideoProcessor(webcamImage);
             _vp.IdentifyFromVideo();
+        }
+
+        //========================================= Download ==============================================
+
+        private void Download_Click(object sender, RoutedEventArgs e)
+        {
+            string downloadsFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
+
+            DownloadBitmap(bitmap, downloadsFolderPath + "Quay" + DateTime.UtcNow.Ticks + ".png");
+        }
+
+        private void DownloadBitmap(WriteableBitmap finalBitmap, string filePath)
+        {
+            if(finalBitmap != null)
+            {
+                SaveBitmapAsPng(finalBitmap, filePath);
+
+                // Open a SaveFileDialog to allow the user to specify the download location
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.FileName = "Quay" + DateTime.UtcNow.Ticks + ".png";
+                saveFileDialog.Filter = "PNG files (*.png)|*.png|All files (*.*)|*.*";
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    System.IO.File.Copy(filePath, saveFileDialog.FileName, true);
+                    MessageBox.Show("Bitmap downloaded.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Create a bitmap first.");
+            }
+        }
+
+        private void SaveBitmapAsPng(WriteableBitmap finalBitmap, string filePath)
+        {
+            using(var stream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+            {
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(finalBitmap));
+                encoder.Save(stream);
+            }
         }
     }
 }

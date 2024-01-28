@@ -6,7 +6,18 @@
     <RootNamespace>Quay_Code</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\Quay Logo Framed 3.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\X_Pink.png" />
+    <None Remove="Assets\X_Red.png" />
+    <None Remove="Assets\X_White.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Quay Logo Framed 3.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Emgu.CV" Version="4.7.0.5276" />
@@ -14,6 +25,18 @@
     <PackageReference Include="Emgu.CV.runtime.windows" Version="4.7.0.5276" />
     <PackageReference Include="OpenCV" Version="2.4.11" />
     <PackageReference Include="STH1123.ReedSolomon" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\X_Pink.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\X_Red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\X_White.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

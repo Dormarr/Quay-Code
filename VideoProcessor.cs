@@ -40,8 +40,12 @@ namespace Quay_Code
                 {
                     _vid.Read(frame);
 
+
+                    //Need to implement alternative methods of detecting different types of codes.
+                    //Same principle as FindSquares, do for Aruco and QR. Need more in depth ways of distinguishing Quay and QR.
                     Mat[] outputArray = _dtc.FindSquares(frame);
-                    //CvInvoke.Imshow("Raw View", frame);
+                    
+                    //CvInvoke.Imshow("ThreshMat", outputArray[0]);
                     frameOut = outputArray[1];
                     var bitmapSource = frame.ToImageSource();
                     webcamImage.Source = bitmapSource;
