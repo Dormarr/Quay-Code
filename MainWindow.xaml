@@ -264,6 +264,7 @@
                     </Rectangle>
                     <Rectangle Width="413" Height="318" VerticalAlignment="Top" HorizontalAlignment="Left" RadiusX="10" RadiusY="10" Fill="#f3f3f3"/>
                     <Button Style="{StaticResource GenerateBtn}" Content="Detect from Camera" HorizontalAlignment="Left" Margin="114,98,0,0" VerticalAlignment="Top" Width="186" Click="Det_Cam_Click"/>
+                    <TextBlock x:Name="OutputTxt" HorizontalAlignment="Left" Margin="72,146,0,0" Text="Omg I'm gonna attack this thing." TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Strawford" Height="93" Width="270"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="SettingsTabBtn" Header="Settings" Style="{StaticResource CustomTab}">

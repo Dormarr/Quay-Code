@@ -29,10 +29,13 @@ namespace Quay_Code
 
     public partial class Detect
     {
-
+        MainWindow mainWindow;
         public Detect()
         {
 
+            mainWindow = Application.Current.MainWindow as MainWindow;
+            
+            
         }
 
         public void DetectFromVideo()
@@ -178,8 +181,8 @@ namespace Quay_Code
             CvInvoke.WarpPerspective(image, persp, m, new Size(bits, bits));
             CvInvoke.Threshold(persp, binary, 64, 255, ThresholdType.Binary);
 
-            //int scaleFactor = DetermineSize(binary);
-            int scaleFactor = DetermineSize(image);
+            int scaleFactor = DetermineSize(binary);
+            //int scaleFactor = DetermineSize(image);
 
             if (scaleFactor != 100)
             {
@@ -202,22 +205,57 @@ namespace Quay_Code
 
                 try
                 {
-                    int dataCount = ReadHeader(binary, scaleFactor)[0];
+                    int dataCount = ReadHeader(binary, scaleFactor);
+
                     Debug.WriteLine($"DataCount = {dataCount}");
-                    //string readUntrunc = ReadCodeData(binary, scaleFactor);
+                    string readUntrunc = ReadCodeData(binary, scaleFactor);
                     //string read = TruncateData(readUntrunc, dataCount);
 
-                    //CvInvoke.PutText(image, " " + read, PointFToPoint(cnt[2]), FontFace.HersheyPlain, 1.2, new MCvScalar(0, 0, 0));
+
+
+                    Debug.WriteLine(readUntrunc);
+                    OnTextOutputChanged(readUntrunc);
+                    //CvInvoke.PutText(image, "    " + readUntrunc, PointFToPoint(cnt[2]), FontFace.HersheyPlain, 1.2, new MCvScalar(255, 255, 40));
 
                     //Await most common output
+
+                    //binary.Save("C:\\Users\\Ryan\\Desktop\\Software Testing Ground\\Spam\\bin" + DateTime.Now.Ticks + ".png");
 
                 }
                 catch(Exception e)
                 {
-                    Debug.WriteLine($"Issue with GetContourBits: {e.Message}");
+                    Debug.WriteLine($"Issue with GetContourBits: {e.Message} Source: {e.StackTrace}");
                 }
 
 
+            }
+        }
+
+        int JustifyDataCount(int sizeMetric, int dataCount)
+        {
+            //You need to limit the output. It thinks Quay12 is 90 chars long, so define how long each of them is because there shouldn't be any overlap.
+            //That just means capping it, right? No you need to be able to read it properly. Maybe pass in the dataCountArray??
+
+            //Reverse dataCount. Instead of 7 0 0 have it be 0 0 7. Shit. That means rewriting the header drawing.
+        }
+
+        private Action<string> textOutputCallback;
+
+        public void SetTextOutputCallback(Action<string> callback)
+        {
+            textOutputCallback = callback;
+            Debug.WriteLine("Callback Set");
+        }
+
+        private void OnTextOutputChanged(string newText)
+        {
+            try
+            {
+                textOutputCallback?.Invoke(newText);
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Exception in OnTextOutputChanged: {e.Message}");
             }
         }
 
@@ -279,54 +317,28 @@ namespace Quay_Code
 
             //Can this be refactored to use the coordinate system?
 
-            for (int r = 2; r <= 2; ++r)
-            {
-                for (int c = 0; c < size; ++c)
-                {
-                    int y = r * pixelLen + (pixelLen / 2); //adjust this to find median colour of slot pixels.
-                    int x = c * pixelLen + (pixelLen / 2);
+            //Can I draw grid and define coords based on that? If it matches up, then use?
+            //Measure the white coords, because black can vary, too much room for error.
 
-                    if (image.GetRawData(y, x)[0] >= 128)
-                    {
-                        chars.Add('W');
-                    }
-                    else
-                    {
-                        chars.Add('B');
-                    }
+            (int, int)[] dataArray = Coords.GetRefSlots(size - 4);
+            StringBuilder refBuild = new StringBuilder();
+
+            for (int i = 0; i < dataArray.Length; i++)
+            {
+                int x = dataArray[i].Item1 * pixelLen + (pixelLen / 2);
+                int y = dataArray[i].Item2 * pixelLen + (pixelLen / 2);
+                byte[] rawData = image.GetRawData(y, x);
+
+                if (rawData[0] == 255 && rawData[1] == 255 && rawData[2] == 255)
+                {
+                    refBuild.Append("");
+                }
+                else
+                {
+                    refBuild.Append("x");
                 }
             }
-            StringBuilder charsToString = new StringBuilder();
-            foreach (char c in chars)
-            {
-                charsToString.Append(c);
-            }
-
-            //size is adjusted because of border. So Q12 becomes 16 etc.
-
-            string strArray = null;
-            string str12 = "BWBWBWBWBWBWBBWB";
-            string str18 = "BWBWBWBWBWBWBWBWBWBBWB";
-            string str24 = "BWBWBWBWBWBWBWBWBWBWBWBWBBWB";
-            string str32 = "BWBWBWBWBWBWBWBWBWBWBWBWBWBWBWBBBBWB";
-
-            switch (size)
-            {
-                case 16:
-                    strArray = str12;
-                    break;
-                case 22:
-                    strArray = str18;
-                    break;
-                case 28:
-                    strArray = str24;
-                    break;
-                case 36:
-                    strArray = str32;
-                    break;
-
-            }
-            if (strArray != null)
+            if(refBuild.ToString() == "")
             {
                 return true;
             }
@@ -336,33 +348,21 @@ namespace Quay_Code
             }
         }
 
-        int[] ReadHeader(Mat image, int sizeMetric)
+        int ReadHeader(Mat image, int sizeMetric)
         {
 
             (int,int)[] headerSlots = Coords.GetHeader(sizeMetric);
 
             List<string> rawHeader = CodeReader(headerSlots, sizeMetric, image);
 
-            string[] dataCountArray = new string[] { (rawHeader[0] + rawHeader[1]), (rawHeader[2] + rawHeader[3]) };
+            string[] dataCountArray = new string[] { (rawHeader[3] + rawHeader[2]), (rawHeader[1] + rawHeader[0]) };
 
             int[] ints = CustomBinary.Read4Bit(dataCountArray);
 
 
+            int finalHeader = int.Parse(string.Join("", ints));
 
-            int dataCountFinal = ints[1];
-
-            if (ints[0] == 1)
-            {
-                dataCountFinal += 10;
-            }
-            else if (ints[0] == 2)
-            {
-                dataCountFinal += 20;
-            }
-
-            int[] finalInts = new int[] { dataCountFinal, 1 };
-
-            return finalInts;
+            return finalHeader;
         }
 
         List<string> CodeReader((int, int)[] dataArray, int sizeMetric, Mat image)
@@ -424,9 +424,7 @@ namespace Quay_Code
 
         string ReadCodeData(Mat image, int sizeMetric)
         {
-            (int, int)[] dataArray = new (int, int)[] { };
-            
-            dataArray = Coords.GetDataSlots(sizeMetric);
+            (int, int)[] dataArray = Coords.GetDataSlots(sizeMetric);
 
             List<string> rawRead = CodeReader(dataArray, sizeMetric, image);
 
@@ -440,7 +438,7 @@ namespace Quay_Code
 
             if (output != null)
             {
-                return new MainWindow().Decode(output, sizeMetric);
+                return mainWindow.Decode(output, sizeMetric);
             }
             else
             {

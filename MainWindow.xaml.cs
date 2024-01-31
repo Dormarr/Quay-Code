@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,11 +22,15 @@ namespace Quay_Code
     /// </summary>
     public partial class MainWindow : Window
     {
-        CusDebug cusDebug = new CusDebug();
+        CusDebug cusDebug;
+        public bool isInit;
         public MainWindow()
         {
             InitializeComponent();
-            
+            isInit = true;
+            Detect detectScript = new Detect();
+            this.ConnectToCV(detectScript);
+
             //cusDebug.Show(); //debug window
         }
 
@@ -142,16 +147,16 @@ namespace Quay_Code
             switch(sizeMetric)
             {
                 case 12:
-                    symCount = $"{inputCount}".PadRight(3, '0');
+                    symCount = $"{inputCount}".PadLeft(3, '0');
                     break;
                 case 18:
-                    symCount = $"{inputCount}".PadRight(3, '0');
+                    symCount = $"{inputCount}".PadLeft(3, '0');
                     break;
                 case 24:
-                    symCount = $"{inputCount}".PadRight(6, '0');
+                    symCount = $"{inputCount}".PadLeft(6, '0');
                     break;
                 case 32:
-                    symCount = $"{inputCount}".PadRight(8, '0');
+                    symCount = $"{inputCount}".PadLeft(8, '0');
                     break;
                 default:
                     return;
@@ -195,13 +200,13 @@ namespace Quay_Code
                     padAmt = 160;
                     break;
                 case 18:
-                    padAmt = 430;
+                    padAmt = 424;
                     break;
                 case 24:
-                    padAmt = 898;
+                    padAmt = 896;
                     break;
                 case 32:
-                    padAmt = 1580;
+                    padAmt = 1576;
                     break;
                 default:
                     padAmt = 160;
@@ -209,9 +214,9 @@ namespace Quay_Code
             }
             string paddedIn = input.PadRight(padAmt, '0');
             byte[] data = GetBytesFromBinaryString(paddedIn);
-            byte[] B4data = Convert.FromBase64String(paddedIn);
-
-            return Encoding.UTF8.GetString(data);
+            //byte[] B4data = Convert.FromBase64String(paddedIn);
+            //Debug.WriteLine($"{B4data}");
+            return Encoding.ASCII.GetString(data);
         }
 
         public static Byte[] GetBytesFromBinaryString(string binary)
@@ -335,6 +340,25 @@ namespace Quay_Code
             }
 
             this.bitmapImg.Source = bitmap;
+        }
+
+        public void ConnectToCV(Detect detect)
+        {
+            detect.SetTextOutputCallback(TextOutputChanged);
+            Debug.WriteLine("Connect Called.");
+        }
+
+        public void TextOutputChanged(string text)
+        {
+            try
+            {
+                Debug.WriteLine(text);
+                OutputTxt.Text = text;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Issue in TextOutputChanged: {e.Message}");
+            }
         }
 
         //=========================== Buttons =====================================
