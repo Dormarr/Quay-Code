@@ -271,27 +271,28 @@ namespace Quay_Code
         static int DetermineSize(Mat image)
         {
             //Add a version of this that accounts for Black border AND white border (if on black background)
+            Dictionary<int, int> sizes = new ()
+            {
+                {1, 12}, {2, 18}, {3, 24}, {4, 32}, 
+            };
+            Dictionary<int, TempObject> tempObjectDict = new()
+            {
+                {1, new TempObject(image, 64, 16) },
+                {2, new TempObject(image, 46, 22) },
+                {3, new TempObject(image, 36, 28) },
+                {4, new TempObject(image, 28, 36) }
+            };
+            int i = 1;
+            TempObject tempObject = tempObjectDict[1];
+            while(!CheckForSize(tempObject.GetImage(), tempObject.GetMetric(), tempObject.GetSize())) {
+                if(!tempObjectDict.ContainsKey(i))
+                {
+                    return 100;
+                }
+                tempObject = tempObjectDict[++i];
+            }
 
-            if (CheckForSize(image, 64, 16))
-            {
-                return 12;
-            }
-            else if (CheckForSize(image, 46, 22))
-            {
-                return 18;
-            }
-            else if (CheckForSize(image, 36, 28))
-            {
-                return 24;
-            }
-            else if (CheckForSize(image, 28, 36))
-            {
-                return 32;
-            }
-            else
-            {
-                return 100;
-            }
+            return sizes[i];
         }
 
         static bool CheckForSize(Mat image, int metric, int size)
@@ -334,7 +335,7 @@ namespace Quay_Code
         List<string> CodeReader((int, int)[] dataArray, int sizeMetric, Mat image)
         {
             List<string> rawRead = new();
-            int pixelLen = (int)1024 / (sizeMetric + 4);
+            int pixelLen = 1024 / (sizeMetric + 4);
 
             for (int i = 0; i < dataArray.Length; i++)
             {
@@ -375,4 +376,24 @@ namespace Quay_Code
         }
 
     }
+}
+
+public class TempObject
+{
+    public Mat image;
+    public int metric;
+    public int size;
+
+    public TempObject() { }
+    public TempObject(Mat image, int metric, int size)
+    {
+        this.image = image;
+        this.metric = metric;
+        this.size = size;
+    }
+
+    public Mat GetImage() { return image; }
+    public int GetMetric() { return metric; }
+    public int GetSize() { return size; }
+
 }
