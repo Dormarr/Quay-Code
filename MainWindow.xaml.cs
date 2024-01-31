@@ -2,18 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Quay_Code
 {
@@ -28,7 +21,7 @@ namespace Quay_Code
         {
             InitializeComponent();
             isInit = true;
-            Detect detectScript = new Detect();
+            Detect detectScript = new();
             this.ConnectToCV(detectScript);
 
             //cusDebug.Show(); //debug window
@@ -93,45 +86,31 @@ namespace Quay_Code
             //cusDebug.debug_BinOut.Text = passAlong;//-----------------------------------------------
 
             WriteHeader(inputCount);
-
             CreateOverlay(sizeMetric);
-
-            
         }
 
         private string PadText(string input)
         {
-            int padAmt;
-
-            switch(sizeMetric)
+            Dictionary<int, int> padAmtDict = new()
             {
-                case 12:
-                    padAmt = 20;
-                    break;
-                case 18:
-                    padAmt = 53;
-                    break;
-                case 24:
-                    padAmt = 112;
-                    break;
-                case 32:
-                    padAmt = 197;
-                    break;
-                default:
-                    //add error render.
-                    return null;
-            }
-            return input.PadRight(padAmt, 'x');
+                {12, 20}, {18, 53}, {24, 112}, {32, 197}
+            };
 
+            if (!padAmtDict.ContainsKey(sizeMetric))
+            {
+                //catch error here
+            }
+
+            return input.PadRight(padAmtDict[sizeMetric], 'x');
         }
 
         private string WriteECC(string input, int inputCount)
         {
-            ECC ecc = new ECC();
+            ECC ecc = new();
             int[] newInts = ecc.Encode(input, inputCount);
             char[] chars = new char[newInts.Length];
 
-            for(int i = 0; i < newInts.Length; i++)
+            for (int i = 0; i < newInts.Length; i++)
             {
                 chars[i] = (char)newInts[i];
             }
@@ -142,38 +121,24 @@ namespace Quay_Code
         private void WriteHeader(int inputCount)
         {
             //additional header elements not yet implemented. Only input count.
-            string symCount;
-
-            switch(sizeMetric)
+            Dictionary<int, string> symCountDict = new()
             {
-                case 12:
-                    symCount = $"{inputCount}".PadLeft(3, '0');
-                    break;
-                case 18:
-                    symCount = $"{inputCount}".PadLeft(3, '0');
-                    break;
-                case 24:
-                    symCount = $"{inputCount}".PadLeft(6, '0');
-                    break;
-                case 32:
-                    symCount = $"{inputCount}".PadLeft(8, '0');
-                    break;
-                default:
-                    return;
-            }
+                {12, PadToLeft(inputCount, 3)}, {18,  PadToLeft(inputCount, 3)}, {24,  PadToLeft(inputCount, 6)}, {32,  PadToLeft(inputCount, 8)}
+            };
 
             //Modular approach to easily expand later.
-
-            string headerOut = symCount; // + other definings.
-
             //divide into chars
-
-            char[] headerChars = headerOut.ToCharArray();
+            char[] headerChars = symCountDict[sizeMetric].ToCharArray();
             string headerUnpaired = CustomBinary.Write4Bit(headerChars);
 
             CreateGraphicCode(EncodeToPairs(headerUnpaired), Coords.GetHeader(sizeMetric));
 
             //cusDebug.debug_BinHeader.Text = headerUnpaired;
+        }
+
+        private String PadToLeft(int inputCount, int padding)
+        {
+            return $"{inputCount}".PadLeft(padding, '0');
         }
 
         private string[] EncodeToPairs(string input)
@@ -192,42 +157,24 @@ namespace Quay_Code
 
         public string Decode(string input, int sizeMetric)
         {
-            int padAmt;
-
-            switch (sizeMetric)
+            Dictionary<int, int> padAmtDict = new()
             {
-                case 12:
-                    padAmt = 160;
-                    break;
-                case 18:
-                    padAmt = 424;
-                    break;
-                case 24:
-                    padAmt = 896;
-                    break;
-                case 32:
-                    padAmt = 1576;
-                    break;
-                default:
-                    padAmt = 160;
-                    break;
-            }
-            string paddedIn = input.PadRight(padAmt, '0');
-            byte[] data = GetBytesFromBinaryString(paddedIn);
+                {12, 160}, {18, 424}, {24, 896}, {32, 1576}
+            };
+
+            string paddedIn = input.PadRight(padAmtDict[sizeMetric], '0');
             //byte[] B4data = Convert.FromBase64String(paddedIn);
             //Debug.WriteLine($"{B4data}");
-            return Encoding.ASCII.GetString(data);
+            return Encoding.ASCII.GetString(GetBytesFromBinaryString(paddedIn));
         }
 
         public static Byte[] GetBytesFromBinaryString(string binary)
         {
-            var list = new List<Byte>();
+            var list = new List<byte>();
 
             for (int i = 0; i < binary.Length; i += 8)
             {
-                String t = binary.Substring(i, 8);
-
-                list.Add(Convert.ToByte(t, 2));
+                list.Add(Convert.ToByte(binary.Substring(i, 8), 2));
             }
 
             return list.ToArray();
@@ -240,28 +187,16 @@ namespace Quay_Code
         {
             int stride = (int)(scaleFactor * _bitmap.Format.BitsPerPixel + 7) / 8;
             //int stride = (int)(scaleFactor * _bitmap.Format.BitsPerPixel) / 8;
-            byte[] colour;
-
-            switch (binPair)
-            {
-                case 00:
-                    colour = new byte[] { 230, 200, 20, 255 }; //CYAN
-                    break;
-                case 01:
-                    colour = new byte[] { 140, 45, 255, 255 }; //MAGENTA
-                    break;
-                case 10:
-                    colour = new byte[] { 20, 220, 255, 255 }; //YELLOW
-                    break;
-                case 11:
-                    colour = new byte[] { 20, 20, 20, 255 }; // BLACK
-                    break;
-                default:
-                    colour = new byte[] { 245, 245, 245, 255 }; //WHITE
-                    break;
-            }
-
+            Dictionary<int, byte[]> colourDict = new() {
+                {00, new byte[] { 230, 200, 20, 255 }}, //CYAN
+                {01, new byte[] { 140, 45, 255, 255 }}, //MAGENTA
+                {10, new byte[] { 20, 220, 255, 255 }}, //YELLOW
+                {11, new byte[] { 20, 20, 20, 255 }}, //BLACK
+                {22,new byte[] { 245, 245, 245, 255 }} //WHITE
+            };
+            byte[] colour = colourDict.ContainsKey(binPair) ? colourDict[binPair] : colourDict[22];
             Byte[] colourData = ColourIndex(colour, x, y, w, h);
+
             _bitmap.WritePixels(new Int32Rect(x, y, w, h), colourData, stride, 0);
 
             return _bitmap;
@@ -276,10 +211,7 @@ namespace Quay_Code
             {
                 for (int x = rectX; x < rectX + rectWidth; x++)
                 {
-                    if (pixelIndex >= 1600)
-                    {
-                        break;
-                    }
+                    if (pixelIndex >= 1600) { break; }
 
                     pixelData[pixelIndex] = inputColour[0];
                     pixelData[pixelIndex + 1] = inputColour[1];
@@ -296,7 +228,7 @@ namespace Quay_Code
         {
             (int, int)[] Bcoords = Coords.GetBlackSlots(sizeMetric);
             string[] Bdata = new string[Bcoords.Length];
-            for(int i = 0; i < Bcoords.Length; i++)
+            for (int i = 0; i < Bcoords.Length; i++)
             {
                 Bdata[i] = "11";
             }
@@ -312,31 +244,25 @@ namespace Quay_Code
 
             (int, int)[] Ccoords = new (int, int)[] { (8, 3), (9, 3), (10, 3) };
             string[] Cdata = new string[] { "00", "01", "10" };
-            CreateGraphicCode (Cdata, Ccoords);
+            CreateGraphicCode(Cdata, Ccoords);
         }
 
-        private void CreateGraphicCode(string[] data, (int,int)[] coords)
+        private void CreateGraphicCode(string[] data, (int, int)[] coords)
         {
             //int scaleFactor = scaledSize / (sizeMetric + 4);
             int scaleFactor = staticSize / (sizeMetric + 4);
 
             for (int i = 0; i < data.Length; i++)
             {
-                int pairInt;
-                int.TryParse(data[i], out pairInt);
-
                 (int, int) coord = coords[i];
 
-                int col = coord.Item1;
-                int row = coord.Item2;
-
-                int rectX = col * scaleFactor;
-                int rectY = row * scaleFactor;
+                int rectX = coord.Item1 * scaleFactor; //col
+                int rectY = coord.Item2 * scaleFactor; //row
 
                 int rectW = scaleFactor;
                 int rectH = scaleFactor;
 
-                bitmap = Mark(pairInt, scaleFactor, rectX, rectY, rectW, rectH, bitmap);
+                bitmap = Mark(int.Parse(data[i]), scaleFactor, rectX, rectY, rectW, rectH, bitmap);
             }
 
             this.bitmapImg.Source = bitmap;
@@ -355,7 +281,7 @@ namespace Quay_Code
                 Debug.WriteLine(text);
                 OutputTxt.Text = text;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.WriteLine($"Issue in TextOutputChanged: {e.Message}");
             }
@@ -398,7 +324,7 @@ namespace Quay_Code
             //Detect dtc = new Detect(webcamImage);
             //dtc.DetectFromVideo();
 
-            VideoProcessor _vp = new VideoProcessor(webcamImage);
+            VideoProcessor _vp = new(webcamImage);
             _vp.IdentifyFromVideo();
         }
 
@@ -413,14 +339,16 @@ namespace Quay_Code
 
         private void DownloadBitmap(WriteableBitmap finalBitmap, string filePath)
         {
-            if(finalBitmap != null)
+            if (finalBitmap != null)
             {
                 SaveBitmapAsPng(finalBitmap, filePath);
 
                 // Open a SaveFileDialog to allow the user to specify the download location
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.FileName = "Quay" + DateTime.UtcNow.Ticks + ".png";
-                saveFileDialog.Filter = "PNG files (*.png)|*.png|All files (*.*)|*.*";
+                SaveFileDialog saveFileDialog = new()
+                {
+                    FileName = "Quay" + DateTime.UtcNow.Ticks + ".png",
+                    Filter = "PNG files (*.png)|*.png|All files (*.*)|*.*"
+                };
 
                 if (saveFileDialog.ShowDialog() == true)
                 {
@@ -436,9 +364,9 @@ namespace Quay_Code
 
         private void SaveBitmapAsPng(WriteableBitmap finalBitmap, string filePath)
         {
-            using(var stream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+            using (var stream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
             {
-                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                PngBitmapEncoder encoder = new();
                 encoder.Frames.Add(BitmapFrame.Create(finalBitmap));
                 encoder.Save(stream);
             }

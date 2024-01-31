@@ -34,8 +34,8 @@ namespace Quay_Code
         {
 
             mainWindow = Application.Current.MainWindow as MainWindow;
-            
-            
+
+
         }
 
         public void DetectFromVideo()
@@ -43,7 +43,7 @@ namespace Quay_Code
             //_vp.IdentifyFromVideo(webcamImg);
             //Mat[] postPro = FindSquares(_vp.ToProcess());
             //webcamImg.Source = postPro[0].ToImageSource();
-            
+
 
 
         }
@@ -54,23 +54,23 @@ namespace Quay_Code
         {
             Mat frameGray = new();
             Mat threshMat = new();
-            MCvScalar sclr = new MCvScalar(85, 255, 55);
+            MCvScalar sclr = new(85, 255, 55);
             CvInvoke.CvtColor(input, frameGray, ColorConversion.Bgr2Gray);
             CvInvoke.AdaptiveThreshold(frameGray, threshMat, 255, AdaptiveThresholdType.MeanC, ThresholdType.BinaryInv, 7, 7);
 
-            VectorOfVectorOfPoint cnts = new VectorOfVectorOfPoint();
+            VectorOfVectorOfPoint cnts = new();
 
             CvInvoke.FindContours(threshMat, cnts, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
 
-            List<PointF> cand = new List<PointF>();
-            VectorOfPointF cnt = new VectorOfPointF();
-            VectorOfPointF cnt2 = new VectorOfPointF();
+            List<PointF> cand = new();
+            VectorOfPointF cnt = new();
+            VectorOfPointF cnt2 = new();
 
-            for(int i = 0; i < cnts.Size; i++)
+            for (int i = 0; i < cnts.Size; i++)
             {
                 CvInvoke.ApproxPolyDP(cnts[i], cnt, 0.005 * CvInvoke.ArcLength(cnts[i], true), true);
 
-                if(cnt.Size !=4 || CvInvoke.ContourArea(cnt) < 200 || !CvInvoke.IsContourConvex(cnt))
+                if (cnt.Size != 4 || CvInvoke.ContourArea(cnt) < 200 || !CvInvoke.IsContourConvex(cnt))
                 {
                     continue;
                 }
@@ -96,7 +96,7 @@ namespace Quay_Code
             }
 
 
-            if(cnt2.Size == 4)
+            if (cnt2.Size == 4)
             {
                 GetContourBits(input, cnt2, 1024);
                 DrawContourFloat(input, cand, new MCvScalar(0, 255, 0));
@@ -128,7 +128,7 @@ namespace Quay_Code
                 Swap(ref cnt[0], ref cnt[1]);
                 Swap(ref cnt[2], ref cnt[3]);
             }
-            VectorOfPointF send = new VectorOfPointF(cnt);
+            VectorOfPointF send = new(cnt);
             return send;
         }
 
@@ -145,7 +145,7 @@ namespace Quay_Code
             {
                 PointF from = cnt[i];
                 PointF to = cnt[(i + 1) % cnt.Count];
-                Line ln = new Line();
+                Line ln = new();
                 CvInvoke.Line(img, PointFToPoint(from), PointFToPoint(to), color, 2);
             }
         }
@@ -172,8 +172,8 @@ namespace Quay_Code
         {
             int pixelLen = (int)Math.Sqrt(bits);
 
-            PointF[] corners = new PointF[4] { new PointF(0, 0), new PointF(bits, 0), new PointF(bits, bits), new PointF(0, bits) };
-            VectorOfPointF cornerV = new VectorOfPointF(corners);
+            PointF[] corners = new PointF[4] { new(0, 0), new(bits, 0), new(bits, bits), new(0, bits) };
+            VectorOfPointF cornerV = new(corners);
 
             Mat m = CvInvoke.GetPerspectiveTransform(cnt, cornerV);
             Mat binary = new();
@@ -189,8 +189,8 @@ namespace Quay_Code
                 CvInvoke.PutText(image, scaleFactor.ToString(), PointFToPoint(cnt[0]), FontFace.HersheyPlain, 2, new MCvScalar(0, 0, 0));
                 DrawFullGrid(binary, scaleFactor, scaleFactor, new MCvScalar(0, 0, 255, 100));
 
-                List<PointF> cand = new List<PointF>();
-                for(int i = 0; i < corners.Length; i++)
+                List<PointF> cand = new();
+                for (int i = 0; i < corners.Length; i++)
                 {
                     cand.Add(corners[i]);
                 }
@@ -222,7 +222,7 @@ namespace Quay_Code
                     //binary.Save("C:\\Users\\Ryan\\Desktop\\Software Testing Ground\\Spam\\bin" + DateTime.Now.Ticks + ".png");
 
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Debug.WriteLine($"Issue with GetContourBits: {e.Message} Source: {e.StackTrace}");
                 }
@@ -245,7 +245,7 @@ namespace Quay_Code
             {
                 textOutputCallback?.Invoke(newText);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.WriteLine($"Exception in OnTextOutputChanged: {e.Message}");
             }
@@ -268,13 +268,6 @@ namespace Quay_Code
             }
         }
 
-        string TruncateData(string input, int dataLength)
-        {
-            string output = input.Substring(0, dataLength);
-
-            return output;
-        }
-
         static int DetermineSize(Mat image)
         {
             //Add a version of this that accounts for Black border AND white border (if on black background)
@@ -287,7 +280,7 @@ namespace Quay_Code
             {
                 return 18;
             }
-            else if(CheckForSize(image, 36, 28))
+            else if (CheckForSize(image, 36, 28))
             {
                 return 24;
             }
@@ -304,7 +297,7 @@ namespace Quay_Code
         static bool CheckForSize(Mat image, int metric, int size)
         {
             int pixelLen = metric;
-            List<char> chars = new List<char>();
+            List<char> chars = new();
 
 
             //Can this be refactored to use the coordinate system?
@@ -313,7 +306,7 @@ namespace Quay_Code
             //Measure the white coords, because black can vary, too much room for error.
 
             (int, int)[] dataArray = Coords.GetRefSlots(size - 4);
-            StringBuilder refBuild = new StringBuilder();
+            StringBuilder refBuild = new();
 
             for (int i = 0; i < dataArray.Length; i++)
             {
@@ -321,37 +314,18 @@ namespace Quay_Code
                 int y = dataArray[i].Item2 * pixelLen + (pixelLen / 2);
                 byte[] rawData = image.GetRawData(y, x);
 
-                if (rawData[0] == 255 && rawData[1] == 255 && rawData[2] == 255)
-                {
-                    refBuild.Append("");
-                }
-                else
-                {
-                    refBuild.Append("x");
-                }
+                refBuild.Append(rawData[0] == 255 && rawData[1] == 255 && rawData[2] == 255 ? "" : "x");
             }
-            if(refBuild.ToString() == "")
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
+            return refBuild.ToString() == "" ? true : false;
         }
 
         int ReadHeader(Mat image, int sizeMetric)
         {
-
-            (int,int)[] headerSlots = Coords.GetHeader(sizeMetric);
-
+            (int, int)[] headerSlots = Coords.GetHeader(sizeMetric);
             List<string> rawHeader = CodeReader(headerSlots, sizeMetric, image);
-
             string[] dataCountArray = new string[] { (rawHeader[3] + rawHeader[2]), (rawHeader[1] + rawHeader[0]) };
-
             int[] ints = CustomBinary.Read4Bit(dataCountArray);
-
-
             int finalHeader = int.Parse(string.Join("", ints));
 
             return finalHeader;
@@ -359,16 +333,7 @@ namespace Quay_Code
 
         List<string> CodeReader((int, int)[] dataArray, int sizeMetric, Mat image)
         {
-            byte[] blue = new byte[] { 255, 0, 0 };
-            byte[] brightBlue = new byte[] { 255, 255, 0 };
-            byte[] red = new byte[] { 0, 0, 255 };
-            byte[] brightRed = new byte[] { 255, 0, 255 };
-            byte[] yellow = new byte[] { 0, 255, 255 };
-            byte[] black = new byte[] { 0, 0, 0 };
-            byte[] white = new byte[] { 255, 255, 255 };
-
-            List<string> rawRead = new List<string>();
-
+            List<string> rawRead = new();
             int pixelLen = (int)1024 / (sizeMetric + 4);
 
             for (int i = 0; i < dataArray.Length; i++)
@@ -376,39 +341,17 @@ namespace Quay_Code
                 int x = dataArray[i].Item1 * pixelLen + (pixelLen / 2);
                 int y = dataArray[i].Item2 * pixelLen + (pixelLen / 2);
                 byte[] rawData = image.GetRawData(y, x); //used to be x,y, but y,x seems to actually work.
+                string flag = "00";
 
-                if (rawData[0] == black[0] && rawData[1] == black[1] && rawData[2] == black[2])
-                {
-                    rawRead.Add("11");
-                }
-                else if (rawData[0] == white[0] && rawData[1] == white[1] && rawData[2] == white[2])
-                {
-                    rawRead.Add("10");
-                }
-                else if (rawData[0] == blue[0] && rawData[1] == blue[1] && rawData[2] == blue[2])
-                {
-                    rawRead.Add("00");
-                }
-                else if (rawData[0] == brightBlue[0] && rawData[1] == brightBlue[1] && rawData[2] == brightBlue[2])
-                {
-                    rawRead.Add("00");
-                }
-                else if (rawData[0] == red[0] && rawData[1] == red[1] && rawData[2] == red[2])
-                {
-                    rawRead.Add("01");
-                }
-                else if (rawData[0] == brightRed[0] && rawData[1] == brightRed[1] && rawData[2] == brightRed[2])
-                {
-                    rawRead.Add("01");
-                }
-                else if (rawData[0] == yellow[0] && rawData[1] == yellow[1] && rawData[2] == yellow[2])
-                {
-                    rawRead.Add("10");
-                }
-                else
-                {
-                    rawRead.Add("00");
-                }
+                flag = rawData.All(new byte[] { 0, 0, 0 }.Contains) ? "11" : flag; //black
+                flag = rawData.All(new byte[] { 255, 255, 255 }.Contains) ? "10" : flag; //white
+                flag = rawData.All(new byte[] { 255, 0, 0 }.Contains) ? "00" : flag; //blue
+                flag = rawData.All(new byte[] { 255, 255, 0 }.Contains) ? "00" : flag; //light blue
+                flag = rawData.All(new byte[] { 0, 0, 255 }.Contains) ? "01" : flag; //red
+                flag = rawData.All(new byte[] { 255, 0, 255 }.Contains) ? "01" : flag;// light red
+                flag = rawData.All(new byte[] { 0, 255, 255 }.Contains) ? "10" : flag; // yellow or default
+
+                rawRead.Add(flag);
             }
 
             return rawRead;
@@ -420,7 +363,7 @@ namespace Quay_Code
 
             List<string> rawRead = CodeReader(dataArray, sizeMetric, image);
 
-            StringBuilder str = new StringBuilder();
+            StringBuilder str = new();
 
             foreach (string s in rawRead)
             {
@@ -428,14 +371,7 @@ namespace Quay_Code
             }
             string output = str.ToString();
 
-            if (output != null)
-            {
-                return mainWindow.Decode(output, sizeMetric);
-            }
-            else
-            {
-                return "botch";
-            }
+            return output != null ? mainWindow.Decode(output, sizeMetric) : "botch";
         }
 
     }
