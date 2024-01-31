@@ -22,6 +22,7 @@ using Image = System.Windows.Controls.Image;
 using System.Windows.Threading;
 using System.ComponentModel;
 using System.Diagnostics;
+using Quay_Code.Entities;
 
 namespace Quay_Code
 {
@@ -271,25 +272,22 @@ namespace Quay_Code
         static int DetermineSize(Mat image)
         {
             //Add a version of this that accounts for Black border AND white border (if on black background)
-            Dictionary<int, int> sizes = new ()
+            List<int> sizes = new (){12, 18, 24, 32};
+            Dictionary<int, ImageData> imgDataDict = new()
             {
-                {1, 12}, {2, 18}, {3, 24}, {4, 32}, 
+                {0, new ImageData(image, 64, 16) },
+                {1, new ImageData(image, 46, 22) },
+                {2, new ImageData(image, 36, 28) },
+                {3, new ImageData(image, 28, 36) }
             };
-            Dictionary<int, TempObject> tempObjectDict = new()
-            {
-                {1, new TempObject(image, 64, 16) },
-                {2, new TempObject(image, 46, 22) },
-                {3, new TempObject(image, 36, 28) },
-                {4, new TempObject(image, 28, 36) }
-            };
-            int i = 1;
-            TempObject tempObject = tempObjectDict[1];
-            while(!CheckForSize(tempObject.GetImage(), tempObject.GetMetric(), tempObject.GetSize())) {
-                if(!tempObjectDict.ContainsKey(i))
+            int i = 0;
+            ImageData imgData = imgDataDict[i];
+            while(!CheckForSize(imgData.GetImage(), imgData.GetMetric(), imgData.GetSize())) {
+                if(!imgDataDict.ContainsKey(++i))
                 {
                     return 100;
                 }
-                tempObject = tempObjectDict[++i];
+                imgData = imgDataDict[i];
             }
 
             return sizes[i];
@@ -361,39 +359,10 @@ namespace Quay_Code
         string ReadCodeData(Mat image, int sizeMetric)
         {
             (int, int)[] dataArray = Coords.GetDataSlots(sizeMetric);
-
             List<string> rawRead = CodeReader(dataArray, sizeMetric, image);
 
-            StringBuilder str = new();
-
-            foreach (string s in rawRead)
-            {
-                str.Append(s);
-            }
-            string output = str.ToString();
-
-            return output != null ? mainWindow.Decode(output, sizeMetric) : "botch";
+            return CodeReader(dataArray, sizeMetric, image).Count() != 0 ? mainWindow.Decode(String.Join("", rawRead), sizeMetric) : "botch";
         }
 
     }
-}
-
-public class TempObject
-{
-    public Mat image;
-    public int metric;
-    public int size;
-
-    public TempObject() { }
-    public TempObject(Mat image, int metric, int size)
-    {
-        this.image = image;
-        this.metric = metric;
-        this.size = size;
-    }
-
-    public Mat GetImage() { return image; }
-    public int GetMetric() { return metric; }
-    public int GetSize() { return size; }
-
 }
