@@ -78,7 +78,7 @@ namespace Quay_Code
                     return;
             }
 
-            cusDebug.debug_SizeMetric.Text = $"{sizeMetric}";
+            //cusDebug.debug_SizeMetric.Text = $"{sizeMetric}";
 
             scaledSize = (sizeMetric + 4) * (staticSize / (sizeMetric + 4));
             //bitmap = new WriteableBitmap(staticSize, staticSize, 96, 96, PixelFormats.Bgra32, null);
@@ -86,11 +86,11 @@ namespace Quay_Code
 
             string passAlong = PadText(input);
             passAlong = WriteECC(passAlong, input.Length);
-            cusDebug.debug_ECCOut.Text = passAlong; //-----------------------------------------------
+            //cusDebug.debug_ECCOut.Text = passAlong; //-----------------------------------------------
             passAlong = CustomBinary.WriteBinary(passAlong, sizeMetric);
             CreateGraphicCode(EncodeToPairs(passAlong), Coords.GetDataSlots(sizeMetric));
 
-            cusDebug.debug_BinOut.Text = passAlong;//-----------------------------------------------
+            //cusDebug.debug_BinOut.Text = passAlong;//-----------------------------------------------
 
             WriteHeader(inputCount);
 
@@ -173,7 +173,7 @@ namespace Quay_Code
 
             CreateGraphicCode(EncodeToPairs(headerUnpaired), Coords.GetHeader(sizeMetric));
 
-            cusDebug.debug_BinHeader.Text = headerUnpaired;
+            //cusDebug.debug_BinHeader.Text = headerUnpaired;
         }
 
         private string[] EncodeToPairs(string input)

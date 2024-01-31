@@ -231,14 +231,6 @@ namespace Quay_Code
             }
         }
 
-        int JustifyDataCount(int sizeMetric, int dataCount)
-        {
-            //You need to limit the output. It thinks Quay12 is 90 chars long, so define how long each of them is because there shouldn't be any overlap.
-            //That just means capping it, right? No you need to be able to read it properly. Maybe pass in the dataCountArray??
-
-            //Reverse dataCount. Instead of 7 0 0 have it be 0 0 7. Shit. That means rewriting the header drawing.
-        }
-
         private Action<string> textOutputCallback;
 
         public void SetTextOutputCallback(Action<string> callback)
