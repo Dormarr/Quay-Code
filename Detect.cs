@@ -44,9 +44,6 @@ namespace Quay_Code
             //_vp.IdentifyFromVideo(webcamImg);
             //Mat[] postPro = FindSquares(_vp.ToProcess());
             //webcamImg.Source = postPro[0].ToImageSource();
-
-
-
         }
 
         //========================= Draw & Identify ==================================
@@ -88,14 +85,8 @@ namespace Quay_Code
                 int cy = (int)(cnt2[0].Y + cnt2[1].Y + cnt2[2].Y + cnt2[3].Y) / 4;
                 CvInvoke.Circle(threshMat, new Point(cx, cy), 4, new MCvScalar(255, 50, 200));
 
-                PointF[] pointsF = ConvertVectorOfPointToPointFArray(cnt2);
-
-                for (int j = 0; j < pointsF.Length; j++)
-                {
-                    cand.Add(pointsF[j]);
-                }
+                cand.AddRange(ConvertVectorOfPointToPointFArray(cnt2));
             }
-
 
             if (cnt2.Size == 4)
             {
@@ -135,9 +126,7 @@ namespace Quay_Code
 
         void Swap<T>(ref T a, ref T b)
         {
-            T temp = a;
-            a = b;
-            b = temp;
+            (b, a) = (a, b);
         }
 
         void DrawContourFloat(Mat img, List<PointF> cnt, MCvScalar color)
@@ -146,7 +135,6 @@ namespace Quay_Code
             {
                 PointF from = cnt[i];
                 PointF to = cnt[(i + 1) % cnt.Count];
-                Line ln = new();
                 CvInvoke.Line(img, PointFToPoint(from), PointFToPoint(to), color, 2);
             }
         }
@@ -188,15 +176,9 @@ namespace Quay_Code
             if (scaleFactor != 100)
             {
                 CvInvoke.PutText(image, scaleFactor.ToString(), PointFToPoint(cnt[0]), FontFace.HersheyPlain, 2, new MCvScalar(0, 0, 0));
-                DrawFullGrid(binary, scaleFactor, scaleFactor, new MCvScalar(0, 0, 255, 100));
+                DrawFullGrid(binary, scaleFactor, new MCvScalar(0, 0, 255, 100));
 
-                List<PointF> cand = new();
-                for (int i = 0; i < corners.Length; i++)
-                {
-                    cand.Add(corners[i]);
-                }
-
-                DrawContourFloat(image, cand, new MCvScalar(0, 255, 0));
+                DrawContourFloat(image, corners.ToList(), new MCvScalar(0, 255, 0));
 
                 //NOW WE HAVE SIZE, WE CAN JUST DECODE.
 
@@ -212,16 +194,11 @@ namespace Quay_Code
                     string readUntrunc = ReadCodeData(binary, scaleFactor);
                     //string read = TruncateData(readUntrunc, dataCount);
 
-
-
                     Debug.WriteLine(readUntrunc);
                     OnTextOutputChanged(readUntrunc);
                     //CvInvoke.PutText(image, "    " + readUntrunc, PointFToPoint(cnt[2]), FontFace.HersheyPlain, 1.2, new MCvScalar(255, 255, 40));
-
                     //Await most common output
-
                     //binary.Save("C:\\Users\\Ryan\\Desktop\\Software Testing Ground\\Spam\\bin" + DateTime.Now.Ticks + ".png");
-
                 }
                 catch (Exception e)
                 {
@@ -252,20 +229,15 @@ namespace Quay_Code
             }
         }
 
-        void DrawFullGrid(Mat img, int rows, int cols, MCvScalar color)
+        void DrawFullGrid(Mat img, int cols, MCvScalar color)
         {
-            int cellW = img.Cols / cols;
-            int cellH = img.Rows / rows;
+            int cell = img.Cols / cols;
 
-            for (int i = 1; i < rows; i++)
-            {
-                int y = i * cellH;
-                CvInvoke.Line(img, new Point(0, y), new Point(img.Cols, y), color, 4);
-            }
             for (int i = 1; i < cols; i++)
             {
-                int x = i * cellW;
-                CvInvoke.Line(img, new Point(x, 0), new Point(x, img.Rows), color, 4);
+                int y = i * cell;
+                CvInvoke.Line(img, new Point(0, y), new Point(img.Cols, y), color, 4);
+                CvInvoke.Line(img, new Point(y, 0), new Point(y, img.Rows), color, 4);
             }
         }
 
@@ -280,6 +252,7 @@ namespace Quay_Code
                 {2, new ImageData(image, 36, 28) },
                 {3, new ImageData(image, 28, 36) }
             };
+
             int i = 0;
             ImageData imgData = imgDataDict[i];
             while(!CheckForSize(imgData.GetImage(), imgData.GetMetric(), imgData.GetSize())) {
@@ -295,28 +268,21 @@ namespace Quay_Code
 
         static bool CheckForSize(Mat image, int metric, int size)
         {
-            int pixelLen = metric;
-            List<char> chars = new();
-
-
             //Can this be refactored to use the coordinate system?
 
             //Can I draw grid and define coords based on that? If it matches up, then use?
             //Measure the white coords, because black can vary, too much room for error.
 
             (int, int)[] dataArray = Coords.GetRefSlots(size - 4);
-            StringBuilder refBuild = new();
+            string result = "";
 
             for (int i = 0; i < dataArray.Length; i++)
             {
-                int x = dataArray[i].Item1 * pixelLen + (pixelLen / 2);
-                int y = dataArray[i].Item2 * pixelLen + (pixelLen / 2);
-                byte[] rawData = image.GetRawData(y, x);
-
-                refBuild.Append(rawData[0] == 255 && rawData[1] == 255 && rawData[2] == 255 ? "" : "x");
+                byte[] rawData = image.GetRawData(dataArray[i].Item2 * metric + (metric / 2), dataArray[i].Item1 * metric + (metric / 2));
+                result += rawData[0] == 255 && rawData[1] == 255 && rawData[2] == 255 ? "" : "x";
             }
 
-            return refBuild.ToString() == "" ? true : false;
+            return result == "" ? true : false;
         }
 
         int ReadHeader(Mat image, int sizeMetric)
