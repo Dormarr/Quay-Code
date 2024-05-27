@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:Quay_Code"
         mc:Ignorable="d"
         Title="Quay" Height="369" Width="800" WindowStyle="None" Background="Transparent" AllowsTransparency="True" ResizeMode="NoResize">
@@ -64,6 +65,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <EventSetter Event="MouseLeftButtonDown" Handler="TabItem_MouseLeftButtonDown"/>
         </Style>
         <Style x:Key="CustomTabControl" TargetType="TabControl">
             <Setter Property="OverridesDefaultStyle" Value="True"/>
@@ -290,6 +292,7 @@
                     <Rectangle Width="413" Height="346" VerticalAlignment="Top" HorizontalAlignment="Left" RadiusX="10" RadiusY="10" Fill="#f3f3f3" Margin="0,-11,0,0"/>
                     <Button Style="{StaticResource GenerateBtn}" Content="Detect from Camera" HorizontalAlignment="Left" Margin="114,98,0,0" VerticalAlignment="Top" Width="186" Click="Det_Cam_Click"/>
                     <TextBlock x:Name="OutputTxt" HorizontalAlignment="Left" Margin="72,146,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Strawford" Height="134" Width="270"><Run Text="I swear I'm working on it. Cam detection is working to a degree, need to improve massively and implement better UI."/><LineBreak/><Run/><LineBreak/><Run Text="Also want to include desktop reading and image upload reading."/><LineBreak/><Run/><LineBreak/><Run Text="Disable camera on change tab."/></TextBlock>
+                    <Button Style="{StaticResource GenerateBtn}" Content="Turn off Camera" HorizontalAlignment="Left" Margin="114,278,0,0" VerticalAlignment="Top" Width="186" Click="TurnOff_Cam_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="SettingsTabBtn" Header="Settings" Style="{StaticResource CustomTab}">

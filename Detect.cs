@@ -91,6 +91,7 @@ namespace Quay_Code
             if (cnt2.Size == 4)
             {
                 GetContourBits(input, cnt2, 1024);
+                //only draw if identified as code.
                 DrawContourFloat(input, cand, new MCvScalar(0, 255, 0));
             }
 

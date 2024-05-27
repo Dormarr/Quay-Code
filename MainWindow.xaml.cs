@@ -319,13 +319,26 @@ namespace Quay_Code
             inputTxt.Text = "geo:latitude,longitude";
         }
 
+        VideoProcessor _vp;
         private void Det_Cam_Click(object sender, RoutedEventArgs e)
         {
             //Detect dtc = new Detect(webcamImage);
             //dtc.DetectFromVideo();
 
-            VideoProcessor _vp = new(webcamImage);
+            _vp = new(webcamImage);
             _vp.IdentifyFromVideo();
+        }
+
+        private void TurnOff_Cam_Click(object sender, RoutedEventArgs e)
+        {
+            _vp.TurnOffCamera(webcamImage);
+            Debug.WriteLine("Turn Off Camera Clicked");
+        }
+
+        private void TabItem_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _vp.TurnOffCamera(webcamImage);
+            Debug.WriteLine("Changed Tab.");
         }
 
         //========================================= Download ==============================================
@@ -371,5 +384,7 @@ namespace Quay_Code
                 encoder.Save(stream);
             }
         }
+
+
     }
 }

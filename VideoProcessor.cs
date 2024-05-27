@@ -11,6 +11,7 @@ using System.ComponentModel;
 using Emgu.CV.CvEnum;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Diagnostics;
 
 namespace Quay_Code
 {
@@ -20,15 +21,55 @@ namespace Quay_Code
         Mat frameOut;
         Image webcamImage;
         Detect _dtc = new();
+        VideoCapture _vid;
+
 
         public VideoProcessor(Image imageFrame)
         {
+            StartFrameUpdate(imageFrame);
+        }
+
+        private void StartFrameUpdate(Image imageFrame)
+        {
             webcamImage = imageFrame;
+            _vid = new(0, VideoCapture.API.DShow);
+        }
+
+        public void TurnOffCamera(Image imageFrame)
+        {
+            _isProcessing = false;
+
+            int width = (int)imageFrame.ActualWidth;
+            int height = (int)imageFrame.ActualHeight;
+
+            WriteableBitmap blackBitmap = new WriteableBitmap(width, height, 32, 32, PixelFormats.Bgra32, null);
+            int[] blackPixels = new int[width * height];
+
+            for(int i = 0; i < blackPixels.Length; i++)
+            {
+                blackPixels[i] = 171717;
+            }
+
+            blackBitmap.WritePixels(new Int32Rect(0, 0, width, height), blackPixels, width * 4, 0);
+
+            try
+            {                
+                _vid.Dispose();
+                _vid = null;
+
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+            webcamImage.Source = blackBitmap;
+            imageFrame.Source = blackBitmap;
+            
         }
 
         public async void IdentifyFromVideo()
         {
-            VideoCapture _vid = new(0, VideoCapture.API.DShow);
+            //_vid = new(0, VideoCapture.API.DShow);
             _isProcessing = true;
 
             try
